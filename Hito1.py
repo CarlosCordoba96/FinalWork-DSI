@@ -94,6 +94,28 @@ for train_index, test_index in kf.split(datos):
     print(scores)
     
 print("Media de los valores: {}".format(np.mean(scores)))
+print(model.feature_importances_)
+
 
 
 #                           HITO 2
+importances = model.feature_importances_
+std = np.std([tree.feature_importances_ for tree in model.estimators_],
+             axis=0)
+indices = np.argsort(importances)[::-1]
+
+# Print the feature ranking
+print("Feature ranking:")
+
+for f in range(X_train.shape[1]):
+    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+
+# Plot the feature importances of the forest
+plt.figure()
+plt.title("Feature importances")
+plt.bar(range(len(model.feature_importances_)), importances,
+       color="r", yerr=std[indices], align="center")
+plt.xticks(range(X_train.shape[1]), indices)
+plt.xlim([-1, X_train.shape[1]])
+plt.show()
+print(list(X_train.columns.values))
