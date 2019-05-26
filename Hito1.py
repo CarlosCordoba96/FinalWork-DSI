@@ -18,6 +18,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import confusion_matrix
+from sklearn.metrics import recall_score
 from sklearn.utils import resample
 import matplotlib.pyplot as plt
 import itertools
@@ -59,7 +60,7 @@ print(df['mode_main'].value_counts())
 
 #COJEMOS 100.000 DATOS DE MUESTRA
 datos=df.sample(n=100000)
-datos=df.reset_index(drop=True)
+datos=datos.reset_index(drop=True)
 
 datosy=datos['mode_main']
 datos=datos.drop(columns='mode_main',axis=0)
@@ -90,39 +91,49 @@ X_tests=[]
 y_trains=[]
 y_tests=[]
 scores = []
+sensitivity=[]
 from sklearn.model_selection import KFold # import KFold
 kf = KFold(n_splits=10)
 for train_index, test_index in kf.split(datos):
     X_train, X_test = datos.iloc[train_index], datos.iloc[test_index]
     y_train, y_test = datosy.iloc[train_index], datosy.iloc[test_index]
+    n=int((X_train.shape[0]*(9/10))/4)
+    X_train['mode_main']=y_train
+    n=int((X_train.shape[0]*(9/10))/4)
+
+    sub0=X_train.loc[X_train['mode_main']==0]
+    sub0=resample(sub0,n_samples=n)
+    
+    sub1=X_train.loc[X_train['mode_main']==1]
+    sub1=resample(sub1,n_samples=n)
+    
+    sub2=X_train.loc[X_train['mode_main']==2]
+    sub2=resample(sub2,n_samples=n)
+    
+    sub3=X_train.loc[X_train['mode_main']==3]
+    sub3=resample(sub3,n_samples=n)
+    
+    X_trained=sub0.append([sub1,sub2,sub3])
+
+
+    y_train=X_trained['mode_main']
+    X_train=X_trained.drop(columns='mode_main',axis=0)
+
     X_trains.append(X_train)
     X_tests.append(X_test)
     y_trains.append(y_train)
     y_tests.append(y_test)
     model.fit(X_train,y_train)
     scores.append(model.score(X_test, y_test))
+    predicted=model.predict(X_test)
+    average_precision = recall_score(y_test, predicted,average='macro')
+    sensitivity.append(average_precision)
+    
     print(scores)
     
 print("Media de los valores: {}".format(np.mean(scores)))
+print("Media de la sensitividad: {}".format(np.mean(sensitivity)))
 print(model.feature_importances_)
-
-X_train['mode_main']=y_train
-
-print(X_train['mode_main'].value_counts())
-n=int((X_train.shape[0]*(9/10))/4)
-print(n)
-sub0=X_train.loc[X_train['mode_main']==0]
-sub0=resample(sub0,n_samples=n)
-print(sub0['mode_main'].value_counts())
-sub1=X_train.loc[X_train['mode_main']==1]
-sub1=resample(sub1,n_samples=n)
-print(sub1['mode_main'].value_counts())
-sub2=X_train.loc[X_train['mode_main']==2]
-sub2=resample(sub2,n_samples=n)
-print(sub2['mode_main'].value_counts())
-sub3=X_train.loc[X_train['mode_main']==3]
-sub3=resample(sub3,n_samples=n)
-print(sub3['mode_main'].value_counts())
 
 
 
