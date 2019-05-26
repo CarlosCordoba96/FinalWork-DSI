@@ -18,11 +18,18 @@ from sklearn.model_selection import train_test_split
 from sklearn.model_selection import KFold
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import confusion_matrix
+from sklearn.utils import resample
 import matplotlib.pyplot as plt
 import itertools
 import seaborn as sns
 import pandas as pd
 
+
+def balancear(dataframeX,dataframeY):
+    dataframeX['mode_main']=dataframeY
+    print(dataframeX['mode_main'].value_counts())
+    
+    
 ##Parametrizar las variables no numéricas
 def male(x):
     if x=='yes':
@@ -47,6 +54,9 @@ df['education']=df['education'].map({'lower':0,'middle':1,'higher':2})
 df['income']=df['income'].map({'less20':0,'20to40':1,'more40':2})
 df['license']=df['license'].map({'yes':1,'no':0})
 df['weekend']=df['weekend'].map({'yes':1,'no':0})
+
+print(df['mode_main'].value_counts())
+
 #COJEMOS 100.000 DATOS DE MUESTRA
 datos=df.sample(n=100000)
 datos=df.reset_index(drop=True)
@@ -96,26 +106,45 @@ for train_index, test_index in kf.split(datos):
 print("Media de los valores: {}".format(np.mean(scores)))
 print(model.feature_importances_)
 
+X_train['mode_main']=y_train
+
+print(X_train['mode_main'].value_counts())
+n=int((X_train.shape[0]*(9/10))/4)
+print(n)
+sub0=X_train.loc[X_train['mode_main']==0]
+sub0=resample(sub0,n_samples=n)
+print(sub0['mode_main'].value_counts())
+sub1=X_train.loc[X_train['mode_main']==1]
+sub1=resample(sub1,n_samples=n)
+print(sub1['mode_main'].value_counts())
+sub2=X_train.loc[X_train['mode_main']==2]
+sub2=resample(sub2,n_samples=n)
+print(sub2['mode_main'].value_counts())
+sub3=X_train.loc[X_train['mode_main']==3]
+sub3=resample(sub3,n_samples=n)
+print(sub3['mode_main'].value_counts())
+
 
 
 #                           HITO 2
-importances = model.feature_importances_
-std = np.std([tree.feature_importances_ for tree in model.estimators_],
-             axis=0)
-indices = np.argsort(importances)[::-1]
-
-# Print the feature ranking
-print("Feature ranking:")
-
-for f in range(X_train.shape[1]):
-    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
-
-# Plot the feature importances of the forest
-plt.figure()
-plt.title("Feature importances")
-plt.bar(range(len(model.feature_importances_)), importances,
-       color="r", yerr=std[indices], align="center")
-plt.xticks(range(X_train.shape[1]), indices)
-plt.xlim([-1, X_train.shape[1]])
-plt.show()
-print(list(X_train.columns.values))
+#importances = model.feature_importances_
+#std = np.std([tree.feature_importances_ for tree in model.estimators_],
+#             axis=0)
+#indices = np.argsort(importances)[::-1]
+#
+## Print the feature ranking
+#print("Feature ranking:")
+#
+#for f in range(X_train.shape[1]):
+#    print("%d. feature %d (%f)" % (f + 1, indices[f], importances[indices[f]]))
+#
+#
+## Plot the feature importances of the forest
+#plt.figure()
+#plt.title("Feature importances")
+#plt.bar(range(len(model.feature_importances_)), importances,
+#       color="r", yerr=std[indices], align="center")
+#plt.xticks(range(X_train.shape[1]), list(X_train.columns.values), rotation='vertical')
+#plt.xlim([-1, X_train.shape[1]])
+#plt.show()
+#print(list(X_train.columns.values))
