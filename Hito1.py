@@ -172,10 +172,47 @@ plt.yticks(range(len(acc_scores)), columnas, rotation='horizontal')
 plt.show()
 
 
+XNewTest['mode_main']=y_tests[9]
+sub0new=XNewTest.loc[XNewTest[XNewTest.mode_main==0].index]
+XNewTest=XNewTest.drop(XNewTest[XNewTest.mode_main==0].index)
+sub0new['distance']=np.random.permutation(sub0new['distance'])
+XNewTest=XNewTest.append(sub0new)
 
+modo_viaje=[0,1,2,3]
+hito2_scores=[]
+hito2_sens=[]
 
-
-
+acc_scores=[]
+scores_modo=[]
+for modo in modo_viaje:
+    for variable in columnas:
+        for i in range(0,10):
+            XNewTest=X_tests[i].copy()
+            XNewTest['mode_main']=y_tests[i]
+            sub0new=XNewTest.loc[XNewTest[XNewTest.mode_main==modo].index]
+            XNewTest=XNewTest.drop(XNewTest[XNewTest.mode_main==modo].index)
+            sub0new[variable]=np.random.permutation(sub0new[variable])
+            XNewTest=XNewTest.append(sub0new)
+            y_tests[i]=XNewTest['mode_main']
+            XNewTest=XNewTest.drop(columns='mode_main',axis=0)
+            
+            model.fit(X_trains[i],y_trains[i])
+            hito2_scores.append(model.score(XNewTest, y_tests[i]))
+            predicted=model.predict(XNewTest)
+            average_precision = recall_score(y_tests[i], predicted,average='macro')
+            hito2_sens.append(average_precision)
+        print("\t EL MODO DE VIAJE:{}".format(modo) )
+        print("\tLA VARIABLE <<{}>>".format(variable))
+        print("Media de los valores: {}".format(np.mean(hito2_scores)))
+        print("Media de la sensibilidad : {}".format(np.mean(hito2_sens)))
+        print("Diferencia de la precisión: {}".format(np.mean(hito2_scores)-hito1_acc))
+        print("Diferencia de la sensibilidad: {}\n".format(np.mean(hito2_sens)-hito1_sensi))
+        acc_scores.append(np.mean(np.mean(hito2_sens)-hito1_sensi))
+        print(acc_scores)
+    scores_modo.append(acc_scores)
+    print(scores_modo)
+    acc_scores=[]
+    
 #importances = model.feature_importances_
 #std = np.std([tree.feature_importances_ for tree in model.estimators_],
 #             axis=0)
