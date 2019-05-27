@@ -146,23 +146,26 @@ columnas=['distance','density','age','male','ethnicity','education','income','ca
 hito2_scores=[]
 hito2_sens=[]
 
+acc_scores=[]
 
-
-
-for i in range(0,10):
-    XNewTest=X_tests[i].copy()
-    XNewTest['distance']=np.random.permutation(XNewTest['distance'])
-    model.fit(X_trains[i],y_trains[i])
-    hito2_scores.append(model.score(XNewTest, y_tests[i]))
-    predicted=model.predict(XNewTest)
-    average_precision = recall_score(y_tests[i], predicted,average='macro')
-    hito2_sens.append(average_precision)
+for variable in columnas:
+    for i in range(0,10):
+        XNewTest=X_tests[i].copy()
+        XNewTest[variable]=np.random.permutation(XNewTest[variable])
+        model.fit(X_trains[i],y_trains[i])
+        hito2_scores.append(model.score(XNewTest, y_tests[i]))
+        predicted=model.predict(XNewTest)
+        average_precision = recall_score(y_tests[i], predicted,average='macro')
+        hito2_sens.append(average_precision)
+    print("\tLA VARIABLE {}".format(variable))
+    print("Media de los valores: {}".format(np.mean(hito2_scores)))
+    print("Media de la sensibilidad : {}".format(np.mean(hito2_sens)))
+    print("Diferencia de la precisión: {}".format(np.mean(hito2_scores)-hito1_acc))
+    print("Diferencia de la sensibilidad: {}\n".format(np.mean(hito2_sens)-hito1_sensi))
+    acc_scores.append(np.mean(hito2_scores)-hito1_acc)
+        
     
-   
-print("Media de los valores: {}".format(np.mean(hito2_scores)))
-print("Media de la sensibilidad : {}".format(np.mean(hito2_sens)))
-print("Diferencia de la precisión: {}".format(np.mean(hito2_scores)-hito1_acc))
-print("Diferencia de la sensibilidad: {}".format(np.mean(hito2_sens)-hito1_sensi))
+
 
 #importances = model.feature_importances_
 #std = np.std([tree.feature_importances_ for tree in model.estimators_],
