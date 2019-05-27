@@ -99,7 +99,6 @@ for train_index, test_index in kf.split(datos):
     y_train, y_test = datosy.iloc[train_index], datosy.iloc[test_index]
     n=int((X_train.shape[0]*(9/10))/4)
     X_train['mode_main']=y_train
-    n=int((X_train.shape[0]*(9/10))/4)
 
     sub0=X_train.loc[X_train['mode_main']==0]
     sub0=resample(sub0,n_samples=n)
@@ -129,12 +128,12 @@ for train_index, test_index in kf.split(datos):
     average_precision = recall_score(y_test, predicted,average='macro')
     sensitivity.append(average_precision)
     
-    print(scores)
-    
 print("Media de los valores: {}".format(np.mean(scores)))
-print("Media de la sensitividad: {}".format(np.mean(sensitivity)))
+print("Media de la sensibilidad : {}".format(np.mean(sensitivity)))
 print(model.feature_importances_)
 
+columnas=['distance','density','age','male','ethnicity','education','income','cars','license',
+          'bicycles','weekend','diversity','green','temp','precip','wind']
 
 
 #                           HITO 2
