@@ -157,14 +157,23 @@ for variable in columnas:
         predicted=model.predict(XNewTest)
         average_precision = recall_score(y_tests[i], predicted,average='macro')
         hito2_sens.append(average_precision)
-    print("\tLA VARIABLE {}".format(variable))
+    print("\tLA VARIABLE <<{}>>".format(variable))
     print("Media de los valores: {}".format(np.mean(hito2_scores)))
     print("Media de la sensibilidad : {}".format(np.mean(hito2_sens)))
     print("Diferencia de la precisión: {}".format(np.mean(hito2_scores)-hito1_acc))
     print("Diferencia de la sensibilidad: {}\n".format(np.mean(hito2_sens)-hito1_sensi))
     acc_scores.append(np.mean(hito2_scores)-hito1_acc)
         
-    
+
+plt.figure()
+plt.title("Accuracy")
+plt.barh(range(len(acc_scores)), acc_scores,color="r", align="center")
+plt.yticks(range(len(acc_scores)), columnas, rotation='horizontal')
+plt.show()
+
+
+
+
 
 
 #importances = model.feature_importances_
