@@ -122,12 +122,17 @@ for train_index, test_index in kf.split(datos):
     X_tests.append(X_test)
     y_trains.append(y_train)
     y_tests.append(y_test)
+    
     model.fit(X_train,y_train)
     scores.append(model.score(X_test, y_test))
+    
     predicted=model.predict(X_test)
     average_precision = recall_score(y_test, predicted,average='macro')
-    sensitivity.append(average_precision)
     
+    sensitivity.append(average_precision)
+
+hito1_acc=np.mean(scores)
+hito1_sensi=np.mean(sensitivity)
 print("Media de los valores: {}".format(np.mean(scores)))
 print("Media de la sensibilidad : {}".format(np.mean(sensitivity)))
 print(model.feature_importances_)
@@ -137,6 +142,28 @@ columnas=['distance','density','age','male','ethnicity','education','income','ca
 
 
 #                           HITO 2
+
+hito2_scores=[]
+hito2_sens=[]
+
+
+
+
+for i in range(0,10):
+    XNewTest=X_tests[i].copy()
+    XNewTest['distance']=np.random.permutation(XNewTest['distance'])
+    model.fit(X_trains[i],y_trains[i])
+    hito2_scores.append(model.score(XNewTest, y_tests[i]))
+    predicted=model.predict(XNewTest)
+    average_precision = recall_score(y_tests[i], predicted,average='macro')
+    hito2_sens.append(average_precision)
+    
+   
+print("Media de los valores: {}".format(np.mean(hito2_scores)))
+print("Media de la sensibilidad : {}".format(np.mean(hito2_sens)))
+print("Diferencia de la precisión: {}".format(np.mean(hito2_scores)-hito1_acc))
+print("Diferencia de la sensibilidad: {}".format(np.mean(hito2_sens)-hito1_sensi))
+
 #importances = model.feature_importances_
 #std = np.std([tree.feature_importances_ for tree in model.estimators_],
 #             axis=0)
