@@ -146,7 +146,7 @@ columnas=['distance','density','age','male','ethnicity','education','income','ca
 hito2_scores=[]
 hito2_sens=[]
 
-acc_scores=[]
+acc2_scores=[]
 
 for variable in columnas:
     for i in range(0,10):
@@ -162,13 +162,13 @@ for variable in columnas:
     print("Media de la sensibilidad : {}".format(np.mean(hito2_sens)))
     print("Diferencia de la precisión: {}".format(np.mean(hito2_scores)-hito1_acc))
     print("Diferencia de la sensibilidad: {}\n".format(np.mean(hito2_sens)-hito1_sensi))
-    acc_scores.append(np.mean(hito2_scores)-hito1_acc)
+    acc2_scores.append(np.mean(hito2_scores)-hito1_acc)
         
 
 plt.figure()
 plt.title("Accuracy")
-plt.barh(range(len(acc_scores)), acc_scores,color="r", align="center")
-plt.yticks(range(len(acc_scores)), columnas, rotation='horizontal')
+plt.barh(range(len(acc2_scores)), acc2_scores,color="r", align="center")
+plt.yticks(range(len(acc2_scores)), columnas, rotation='horizontal')
 plt.show()
 
 
@@ -212,6 +212,14 @@ for modo in modo_viaje:
     scores_modo.append(acc_scores)
     print(scores_modo)
     acc_scores=[]
+    
+for mode in modo_viaje:
+    plt.figure()
+    plt.title("Modo {} ".format(mode))
+    plt.barh(range(len(scores_modo[mode])), scores_modo[mode],color="r", align="center")
+    plt.yticks(range(len(scores_modo[mode])), columnas, rotation='horizontal')
+    plt.show()
+
     
 #importances = model.feature_importances_
 #std = np.std([tree.feature_importances_ for tree in model.estimators_],
